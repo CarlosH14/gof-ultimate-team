@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gang of Four Ultimate Team — Patrones de Diseño</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="fut-header">
+    <div class="fut-header-inner">
+      <div class="fut-logo">
+        <span class="fut-logo-badge">GoF</span>
+        <div class="fut-logo-text">
+          <h1>GANG OF FOUR <span>ULTIMATE TEAM</span></h1>
+          <p class="fut-tagline">Patrones de Diseño de Programación</p>
+        </div>
+      </div>
+      <div class="fut-header-stats">
+        <div class="hstat"><span class="hstat-num">23</span><span class="hstat-label">Patrones</span></div>
+        <div class="hstat"><span class="hstat-num">3</span><span class="hstat-label">Categorías</span></div>
+        <div class="hstat"><span class="hstat-num">1994</span><span class="hstat-label">Desde</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="intro">
+    <h2>¿Qué son los patrones de diseño?</h2>
+    <p>
+      Los patrones de diseño son <strong>soluciones probadas a problemas recurrentes</strong> en el
+      diseño de software orientado a objetos. No son código que copias y pegas, sino
+      <em>plantillas conceptuales</em>: describen el problema, la solución y sus consecuencias,
+      para que las adaptes a tu contexto.
+    </p>
+    <p>
+      En 1994, <strong>Erich Gamma, Richard Helm, Ralph Johnson y John Vlissides</strong> — conocidos
+      como la <strong>"Banda de los Cuatro" (Gang of Four)</strong> — publicaron
+      <em>Design Patterns: Elements of Reusable Object-Oriented Software</em>, el libro que catalogó
+      los 23 patrones clásicos en tres categorías. Aquí te presentamos a la plantilla completa:
+      el <strong>once titular</strong> con los patrones más usados en el campo, y un
+      <strong>banquillo</strong> de lujo con el resto.
+    </p>
+    <div class="category-legend">
+      <button class="cat-chip active" data-cat="all"><span class="chip-dot dot-all"></span>Todos</button>
+      <button class="cat-chip" data-cat="creacional"><span class="chip-dot dot-creacional"></span>Creacionales · Defensa</button>
+      <button class="cat-chip" data-cat="estructural"><span class="chip-dot dot-estructural"></span>Estructurales · Mediocampo</button>
+      <button class="cat-chip" data-cat="comportamiento"><span class="chip-dot dot-comportamiento"></span>Comportamiento · Ataque</button>
+    </div>
+  </section>
+
+  <main>
+    <section class="pitch-section">
+      <h2 class="section-title"><span>ONCE TITULAR</span> — Formación 4-3-3</h2>
+      <div class="pitch-wrap">
+        <div class="pitch" id="pitch">
+          <svg class="pitch-lines" viewBox="0 0 100 130" preserveAspectRatio="none" aria-hidden="true">
+            <!-- líneas del campo -->
+            <rect x="3" y="3" width="94" height="124" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>
+            <line x1="3" y1="65" x2="97" y2="65" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>
+            <circle cx="50" cy="65" r="12" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>
+            <circle cx="50" cy="65" r=".8" fill="rgba(255,255,255,.4)"/>
+            <rect x="28" y="3" width="44" height="16" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>
+            <rect x="38" y="3" width="24" height="7" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>
+            <rect x="28" y="111" width="44" height="16" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>
+            <rect x="38" y="120" width="24" height="7" fill="none" stroke="rgba(255,255,255,.35)" stroke-width=".5"/>
+          </svg>
+          <svg class="chem-lines" id="chemLines" aria-hidden="true"></svg>
+          <!-- cartas titulares inyectadas por JS -->
+        </div>
+      </div>
+      <p class="pitch-hint">Las líneas <span class="hint-green">verdes</span> conectan patrones con fuerte química (se combinan a menudo). Haz clic en una carta para ver la ficha completa.</p>
+    </section>
+
+    <section class="bench-section">
+      <h2 class="section-title"><span>BANQUILLO</span> — Suplentes de lujo</h2>
+      <div class="bench" id="bench"></div>
+    </section>
+  </main>
+
+  <!-- Modal de detalle -->
+  <div class="modal-overlay" id="modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="modal-close" id="modalClose" aria-label="Cerrar">✕</button>
+      <div class="modal-body">
+        <div class="modal-card-col" id="modalCardCol"></div>
+        <div class="modal-info-col">
+          <div class="modal-head">
+            <h3 id="modalTitle"></h3>
+            <p class="modal-intent" id="modalIntent"></p>
+          </div>
+          <div class="tabs" id="tabs">
+            <button class="tab active" data-tab="explicacion">Problema y solución</button>
+            <button class="tab" data-tab="analogia">Analogía</button>
+            <button class="tab" data-tab="codigo">Código Python</button>
+            <button class="tab" data-tab="stats">Atributos</button>
+          </div>
+          <div class="tab-panel" id="panel-explicacion">
+            <h4>⚠ El problema</h4>
+            <p id="modalProblema"></p>
+            <h4>✔ La solución</h4>
+            <p id="modalSolucion"></p>
+          </div>
+          <div class="tab-panel" id="panel-analogia" hidden>
+            <p id="modalAnalogia"></p>
+          </div>
+          <div class="tab-panel" id="panel-codigo" hidden>
+            <pre><code id="modalCodigo"></code></pre>
+          </div>
+          <div class="tab-panel" id="panel-stats" hidden>
+            <div class="stats-grid" id="modalStats"></div>
+            <div class="chem-list" id="modalChem"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="fut-footer">
+    <p>Basado en <em>Design Patterns: Elements of Reusable Object-Oriented Software</em> (Gamma, Helm, Johnson &amp; Vlissides, 1994).</p>
+    <p>Estilo inspirado en FIFA Ultimate Team. Página educativa sin ánimo de lucro.</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
