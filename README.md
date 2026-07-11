@@ -25,6 +25,8 @@ Una página web educativa que presenta los patrones de diseño clásicos del lib
 - **Filtros por categoría** para resaltar creacionales, estructurales o de comportamiento.
 - **Haz tus cambios** — arrastra una carta sobre otra (o usa el botón ⇄) para intercambiar
   suplentes y titulares; la media del equipo y las líneas de química se recalculan al momento.
+- **Cambia la formación** — 4-3-3, 4-4-2, 4-2-3-1, 3-5-2 o 5-3-2; el once se recoloca en los
+  nuevos huecos y las etiquetas de posición (POR, DFC, MCO…) se actualizan con la táctica.
 
 ## Ejecutar en local
 

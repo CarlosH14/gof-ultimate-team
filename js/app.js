@@ -1,6 +1,6 @@
 // ============================================================
-// GoF Ultimate Team — render de cartas, química, modal, filtros
-// e intercambios banquillo ↔ titular (drag & drop o botón ⇄)
+// GoF Ultimate Team — render de cartas, química, modal, filtros,
+// intercambios banquillo ↔ titular y cambio de formación
 // ============================================================
 
 (function () {
@@ -22,17 +22,73 @@
     visitor: "🩺", interpreter: "🗣️",
   };
 
-  // Los huecos de la formación conservan su etiqueta de posición:
-  // el pos del slot viaja con las coords cuando hay intercambios.
-  PATRONES.filter((p) => p.titular).forEach((p) => (p.coords.pos = p.posicion));
+  // Huecos de cada formación, en orden: portero → defensa → medio → ataque.
+  // Al cambiar de formación, el once se re-coloca en ese mismo orden.
+  const FORMACIONES = {
+    "4-3-3": [
+      { x: 50, y: 90, pos: "POR" },
+      { x: 12, y: 68, pos: "LI" }, { x: 32, y: 72, pos: "DFC" }, { x: 68, y: 72, pos: "DFC" }, { x: 88, y: 68, pos: "LD" },
+      { x: 24, y: 45, pos: "MC" }, { x: 50, y: 40, pos: "MCO" }, { x: 76, y: 45, pos: "MC" },
+      { x: 20, y: 16, pos: "EI" }, { x: 50, y: 12, pos: "DC" }, { x: 80, y: 16, pos: "ED" },
+    ],
+    "4-4-2": [
+      { x: 50, y: 90, pos: "POR" },
+      { x: 12, y: 68, pos: "LI" }, { x: 32, y: 72, pos: "DFC" }, { x: 68, y: 72, pos: "DFC" }, { x: 88, y: 68, pos: "LD" },
+      { x: 13, y: 42, pos: "MI" }, { x: 37, y: 46, pos: "MC" }, { x: 63, y: 46, pos: "MC" }, { x: 87, y: 42, pos: "MD" },
+      { x: 35, y: 14, pos: "DC" }, { x: 65, y: 14, pos: "DC" },
+    ],
+    "4-2-3-1": [
+      { x: 50, y: 90, pos: "POR" },
+      { x: 12, y: 68, pos: "LI" }, { x: 32, y: 72, pos: "DFC" }, { x: 68, y: 72, pos: "DFC" }, { x: 88, y: 68, pos: "LD" },
+      { x: 37, y: 54, pos: "MCD" }, { x: 63, y: 54, pos: "MCD" },
+      { x: 18, y: 30, pos: "MI" }, { x: 50, y: 32, pos: "MCO" }, { x: 82, y: 30, pos: "MD" },
+      { x: 50, y: 10, pos: "DC" },
+    ],
+    "3-5-2": [
+      { x: 50, y: 90, pos: "POR" },
+      { x: 25, y: 72, pos: "DFC" }, { x: 50, y: 75, pos: "DFC" }, { x: 75, y: 72, pos: "DFC" },
+      { x: 10, y: 44, pos: "MI" }, { x: 30, y: 48, pos: "MC" }, { x: 50, y: 40, pos: "MCO" }, { x: 70, y: 48, pos: "MC" }, { x: 90, y: 44, pos: "MD" },
+      { x: 35, y: 13, pos: "DC" }, { x: 65, y: 13, pos: "DC" },
+    ],
+    "5-3-2": [
+      { x: 50, y: 90, pos: "POR" },
+      { x: 10, y: 62, pos: "CAI" }, { x: 30, y: 72, pos: "DFC" }, { x: 50, y: 75, pos: "DFC" }, { x: 70, y: 72, pos: "DFC" }, { x: 90, y: 62, pos: "CAD" },
+      { x: 30, y: 42, pos: "MC" }, { x: 50, y: 37, pos: "MCO" }, { x: 70, y: 42, pos: "MC" },
+      { x: 35, y: 13, pos: "DC" }, { x: 65, y: 13, pos: "DC" },
+    ],
+  };
+
+  let formacionActual = "4-3-3";
+
+  // once titular en el orden de los huecos de la formación
+  let once = [
+    "singleton",
+    "builder", "factory-method", "abstract-factory", "prototype",
+    "adapter", "decorator", "facade",
+    "observer", "strategy", "command",
+  ];
 
   // orden del banquillo (mutable con los intercambios)
-  let banquillo = PATRONES.filter((p) => !p.titular)
+  let banquillo = PATRONES.filter((p) => !once.includes(p.id))
     .sort((a, b) => b.rating - a.rating)
     .map((p) => p.id);
 
   let filtroActual = "all";
   let seleccionado = null; // id pendiente de intercambio vía botón ⇄
+
+  // asigna huecos de la formación actual al once
+  function asignarPosiciones() {
+    PATRONES.forEach((p) => {
+      p.titular = false;
+      p.coords = null;
+    });
+    const slots = FORMACIONES[formacionActual];
+    once.forEach((id, i) => {
+      const p = porId[id];
+      p.titular = true;
+      p.coords = { ...slots[i] };
+    });
+  }
 
   // ---------- carta FUT ----------
 
@@ -123,37 +179,54 @@
   }
 
   function intercambiar(idA, idB) {
-    const a = porId[idA];
-    const b = porId[idB];
+    const i = once.indexOf(idA);
+    const j = once.indexOf(idB);
 
-    if (a.titular && b.titular) {
+    if (i >= 0 && j >= 0) {
       // dos titulares: se cambian el hueco de la formación
-      [a.coords, b.coords] = [b.coords, a.coords];
-    } else if (!a.titular && !b.titular) {
+      [once[i], once[j]] = [once[j], once[i]];
+    } else if (i < 0 && j < 0) {
       // dos suplentes: se cambian el sitio en el banquillo
-      const i = banquillo.indexOf(idA);
-      const j = banquillo.indexOf(idB);
-      [banquillo[i], banquillo[j]] = [banquillo[j], banquillo[i]];
+      const bi = banquillo.indexOf(idA);
+      const bj = banquillo.indexOf(idB);
+      [banquillo[bi], banquillo[bj]] = [banquillo[bj], banquillo[bi]];
     } else {
       // suplente ↔ titular
-      const titular = a.titular ? a : b;
-      const suplente = a.titular ? b : a;
-      suplente.coords = titular.coords;
-      titular.coords = null;
-      suplente.titular = true;
-      titular.titular = false;
-      banquillo[banquillo.indexOf(suplente.id)] = titular.id;
+      const idxOnce = i >= 0 ? i : j;
+      const idSuplente = i >= 0 ? idB : idA;
+      const idTitular = once[idxOnce];
+      once[idxOnce] = idSuplente;
+      banquillo[banquillo.indexOf(idSuplente)] = idTitular;
     }
 
     seleccionado = null;
     render();
   }
 
+  // ---------- cambio de formación ----------
+
+  const selFormacion = document.getElementById("selFormacion");
+  Object.keys(FORMACIONES).forEach((nombre) => {
+    const opt = document.createElement("option");
+    opt.value = nombre;
+    opt.textContent = nombre;
+    selFormacion.appendChild(opt);
+  });
+  selFormacion.value = formacionActual;
+  selFormacion.addEventListener("change", () => {
+    formacionActual = selFormacion.value;
+    seleccionado = null;
+    render();
+  });
+
   // ---------- render de campo y banquillo ----------
 
   function render() {
+    asignarPosiciones();
+
     pitch.querySelectorAll(".fut-card").forEach((el) => el.remove());
-    PATRONES.filter((p) => p.titular).forEach((p) => {
+    once.forEach((id) => {
+      const p = porId[id];
       const carta = crearCarta(p);
       carta.style.left = p.coords.x + "%";
       carta.style.top = p.coords.y + "%";
@@ -171,21 +244,20 @@
   function actualizarMedia() {
     const el = document.getElementById("mediaEquipo");
     if (!el) return;
-    const titulares = PATRONES.filter((p) => p.titular);
-    const media = Math.round(titulares.reduce((s, p) => s + p.rating, 0) / titulares.length);
+    const media = Math.round(once.reduce((s, id) => s + porId[id].rating, 0) / once.length);
     el.textContent = media;
   }
 
   // ---------- líneas de química ----------
 
   function dibujarQuimica() {
-    const titulares = PATRONES.filter((p) => p.titular);
     const pintadas = new Set();
     chemSvg.setAttribute("viewBox", "0 0 100 130");
     chemSvg.setAttribute("preserveAspectRatio", "none");
     chemSvg.innerHTML = "";
 
-    titulares.forEach((p) => {
+    once.forEach((id) => {
+      const p = porId[id];
       p.quimica.forEach((otroId) => {
         const otro = porId[otroId];
         if (!otro || !otro.titular) return;
