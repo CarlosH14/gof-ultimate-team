@@ -23,6 +23,8 @@ Una página web educativa que presenta los patrones de diseño clásicos del lib
   (futbolística cuando encaja), **ejemplo ejecutable en Python** con resaltado de sintaxis,
   y 6 atributos tipo FUT (frecuencia, flexibilidad, testabilidad…).
 - **Filtros por categoría** para resaltar creacionales, estructurales o de comportamiento.
+- **Haz tus cambios** — arrastra una carta sobre otra (o usa el botón ⇄) para intercambiar
+  suplentes y titulares; la media del equipo y las líneas de química se recalculan al momento.
 
 ## Ejecutar en local
 

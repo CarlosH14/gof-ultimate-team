@@ -205,23 +205,71 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   padding: 0;
   transition: filter 0.2s, opacity 0.2s;
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+  -webkit-user-select: none;
+  user-select: none;
 }
-.fut-card:hover { filter: drop-shadow(0 6px 14px rgba(245, 214, 123, 0.55)); z-index: 5; }
+.fut-card:hover, .fut-card:focus-visible { filter: drop-shadow(0 6px 14px rgba(245, 214, 123, 0.55)); z-index: 5; }
 .fut-card.dimmed { opacity: 0.25; }
 
+.fut-card.dragging { opacity: 0.35; }
+.fut-card.drop-target {
+  filter: drop-shadow(0 0 14px rgba(124, 252, 0, 0.9));
+  z-index: 6;
+}
+.fut-card.selected {
+  filter: drop-shadow(0 0 16px rgba(124, 252, 0, 1));
+  z-index: 6;
+}
+.fut-card.selected .card-inner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+  background: rgba(124, 252, 0, 0.14);
+  pointer-events: none;
+}
+
+/* marco exterior (rim) dorado oscuro + cara interior clara, como las FUT reales */
 .card-inner {
   clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
-  background: linear-gradient(165deg, var(--gold-1) 0%, var(--gold-2) 45%, var(--gold-3) 100%);
+  background: linear-gradient(165deg, #8a6410 0%, #6f4e0a 55%, #4a3305 100%);
   color: var(--gold-text);
-  padding: 8% 6% 18%;
+  position: relative;
+  padding: 2.5% 2.5% 3.5%;
+}
+
+.card-face {
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+  background:
+    radial-gradient(ellipse 95% 55% at 50% 0%, rgba(255, 255, 255, 0.45), transparent 60%),
+    radial-gradient(ellipse 80% 45% at 50% 105%, rgba(122, 84, 10, 0.55), transparent 60%),
+    linear-gradient(165deg, #fdeeb0 0%, #f3d478 30%, #e0b04a 62%, #c08a1e 100%);
+  padding: 7% 6% 16%;
   text-align: center;
   position: relative;
 }
 
+/* brillo diagonal al pasar el ratón */
+.card-face::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.35) 46%, rgba(255, 255, 255, 0.08) 54%, transparent 66%);
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+  pointer-events: none;
+}
+.fut-card:hover .card-face::before { transform: translateX(120%); }
+
 /* carta inform (oscura) para el portero, como el TIR/BAS de la imagen */
 .fut-card.inform .card-inner {
-  background: linear-gradient(165deg, #3a3a44 0%, var(--inform-1) 40%, var(--inform-2) 100%);
+  background: linear-gradient(165deg, #55555f 0%, #2c2c34 55%, #101014 100%);
   color: #f0d98c;
+}
+.fut-card.inform .card-face {
+  background:
+    radial-gradient(ellipse 95% 55% at 50% 0%, rgba(255, 255, 255, 0.10), transparent 60%),
+    linear-gradient(165deg, #43434d 0%, var(--inform-1) 40%, var(--inform-2) 100%);
 }
 
 .card-top {
@@ -229,15 +277,31 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   align-items: flex-start;
   justify-content: space-between;
   text-align: left;
+  min-height: 52%;
+}
+
+/* columna izquierda: rating / posición / línea / categoría, como en FIFA 15 */
+.card-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4%;
+  flex: 0 0 auto;
 }
 .card-rating { font-size: clamp(1rem, 2.2vw, 1.5rem); font-weight: 800; line-height: 1; }
-.card-pos { display: block; font-size: clamp(0.5rem, 1vw, 0.7rem); font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; }
-.card-caticon { font-size: clamp(0.8rem, 1.6vw, 1.2rem); line-height: 1; }
+.card-pos { font-size: clamp(0.5rem, 1vw, 0.7rem); font-weight: 700; letter-spacing: 0.5px; }
+.card-metaline { width: 70%; height: 1px; background: rgba(74, 53, 5, 0.45); margin: 8% 0; }
+.fut-card.inform .card-metaline { background: rgba(240, 217, 140, 0.4); }
+.card-flag, .card-club { font-size: clamp(0.6rem, 1.2vw, 0.85rem); line-height: 1.3; }
 
-.card-crest {
-  font-size: clamp(1.2rem, 3vw, 2.2rem);
-  margin: 4% 0 6%;
-  line-height: 1;
+/* "retrato" del patrón */
+.card-photo {
+  flex: 1;
+  font-size: clamp(1.5rem, 3.6vw, 2.6rem);
+  line-height: 1.1;
+  align-self: center;
+  text-align: center;
+  filter: drop-shadow(0 3px 3px rgba(74, 53, 5, 0.45));
 }
 
 .card-name {
@@ -245,7 +309,8 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.4px;
-  border-top: 1px solid rgba(0, 0, 0, 0.25);
+  border-top: 1px solid rgba(74, 53, 5, 0.35);
+  margin-top: 4%;
   padding-top: 5%;
   white-space: nowrap;
   overflow: hidden;
@@ -253,12 +318,45 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
 }
 .fut-card.inform .card-name { border-top-color: rgba(240, 217, 140, 0.35); }
 
-.card-cat {
+.card-catrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6%;
   font-size: clamp(0.42rem, 0.9vw, 0.6rem);
   text-transform: uppercase;
   letter-spacing: 1px;
-  opacity: 0.75;
+  opacity: 0.8;
   margin-top: 2px;
+}
+.catdot { width: 3px; height: 3px; border-radius: 50%; background: currentColor; opacity: 0.6; flex: 0 0 auto; }
+
+/* botón de intercambio */
+.card-swap {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(160deg, var(--gold-1), var(--gold-3));
+  color: var(--gold-text);
+  font-size: 0.8rem;
+  font-weight: 800;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.fut-card:hover .card-swap, .fut-card:focus-visible .card-swap, .fut-card.selected .card-swap { opacity: 1; }
+.card-swap:hover { transform: scale(1.15); }
+.fut-card.selected .card-swap { background: linear-gradient(160deg, #b6ff6e, #4caf50); }
+
+@media (hover: none) {
+  .card-swap { opacity: 0.85; }   /* táctil: siempre visible */
 }
 
 /* etiqueta de posición fuera de la carta (como "MCO", "LI" en la imagen) */
@@ -355,6 +453,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   pointer-events: none;
 }
 .modal-card-col .card-postag { display: none; }
+.modal-card-col .card-swap { display: none; }
 
 .modal-head h3 { font-size: 1.7rem; letter-spacing: 1px; color: var(--gold-1); }
 .modal-intent { color: var(--text-dim); font-style: italic; margin: 0.4rem 0 1rem; line-height: 1.5; }
