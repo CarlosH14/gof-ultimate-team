@@ -1,86 +1,90 @@
 ---
 name: design-spec
-description: "Convierte ideas sueltas de un brainstorming (o una descripción informal de una feature) en un documento formal de especificación de diseño escrito desde la perspectiva del usuario, guardado en specs/[nombre-feature]-spec.md. Primero hace 3-5 preguntas de clarificación, luego genera la spec (resumen, problema, historias de usuario, criterios de aceptación, fuera de alcance, preguntas abiertas) y se DETIENE a esperar aprobación explícita antes de cualquier implementación o planificación. Usa este skill cuando el usuario diga \"crea una spec\", \"especificación de diseño\", \"formaliza esta idea\", \"design spec\", o cuando traiga ideas de un brainstorming que quiera convertir en algo construible. No lo uses para implementar directamente ni para sesiones de brainstorming puro (para eso está el skill brainstorming)."
+description: "Convierte ideas sueltas de un brainstorming o la descripción informal de una feature en un documento formal de especificación de diseño escrito desde la perspectiva del usuario. Hace primero 3-5 preguntas de clarificación (problema, usuario, casos de éxito, casos de error, fuera de alcance) y luego genera specs/[nombre-feature]-spec.md con resumen, problema y contexto, historias de usuario, criterios de aceptación verificables, fuera de alcance y preguntas abiertas. Tras escribir el documento SE DETIENE y exige aprobación explícita antes de avanzar a planificación o implementación. Usa este skill cuando el usuario diga \"crea una spec\", \"especificación de diseño\", \"formaliza esta idea\", \"design spec\", o cuando traiga ideas de brainstorming que quiera convertir en algo construible. No lo uses para tareas de ejecución pura donde ya hay una spec o el usuario solo quiere que se implemente algo ya definido."
 ---
 
-# Design Spec — de idea suelta a especificación formal
+# Design Spec — de idea informal a especificación construible
 
-Tu trabajo es tomar ideas informales —notas de un brainstorming, una descripción vaga de una feature— y convertirlas en un **documento de especificación de diseño** que alguien pueda usar para construir. La spec se escribe **desde la perspectiva del usuario final**: qué problema tiene, qué quiere lograr, cómo sabe que funcionó. No es un documento técnico de implementación.
+Tu trabajo es tomar una idea vaga —notas de un brainstorming, la descripción suelta de una feature— y convertirla en un **documento de especificación formal escrito desde la perspectiva del usuario**: qué necesita, por qué, y cómo se sabrá que está bien resuelto. No es un plan técnico ni una lista de tareas; es el contrato de *qué* se va a construir y *qué cuenta como éxito*, antes de decidir el *cómo*.
 
-Todo el documento y la conversación van **en español**.
+El usuario es desarrollador web (Node.js, Express, PostgreSQL, Leaflet, vanilla JS). **Escribe siempre en español.** Ajusta el vocabulario y los ejemplos a ese stack cuando sea natural, pero mantén la spec centrada en el usuario y el comportamiento, no en la implementación.
 
-**Contexto del desarrollador**: stack web con Node.js, Express, PostgreSQL, Leaflet y vanilla JS. Tenlo en cuenta para que los criterios de aceptación sean realistas en ese stack, pero la spec NO debe prescribir detalles de implementación.
+La regla que define este skill: **primero preguntas, luego escribes, luego te detienes a pedir aprobación.** No te saltes ninguno de los tres pasos.
 
-## Fase 1 — Clarificar antes de escribir (obligatoria)
+## Paso 1 — Clarifica antes de escribir (3-5 preguntas)
 
-NUNCA escribas el documento directamente. Primero haz **3-5 preguntas de clarificación** en un solo mensaje, eligiendo las que más reduzcan la ambigüedad sobre:
+No escribas ni una línea de la spec hasta haber preguntado. Haz **entre 3 y 5 preguntas** de clarificación, en un solo mensaje, que cubran lo que de verdad no puedes inferir de forma segura. Prioriza estos ejes:
 
-1. **El problema que resuelve** — ¿qué duele hoy, concretamente?
-2. **Quién es el usuario** — ¿quién usa esto y en qué situación?
-3. **Casos de éxito esperados** — ¿qué tiene que pasar para decir "funciona"?
-4. **Casos de error** — ¿qué pasa cuando algo falla (datos inválidos, red caída, estado vacío)?
-5. **Qué queda FUERA del alcance** — ¿qué NO va a hacer esta versión?
+- **El problema que resuelve** — ¿qué duele hoy? ¿Qué pasa si no se construye nada? Obliga a concretar lo vago: "gestionar ubicaciones" no es un problema; "el usuario no puede ver en un mapa qué pedidos están cerca de cada repartidor" sí.
+- **Quién es el usuario** — ¿quién usa esto exactamente y en qué contexto? ¿Un admin interno, un cliente final, otro sistema vía API? Sus capacidades y limitaciones cambian toda la spec.
+- **Casos de éxito esperados** — ¿cómo se ve "esto funcionó"? El flujo feliz concreto, con datos de ejemplo si ayuda.
+- **Casos de error** — ¿qué puede salir mal desde la óptica del usuario? Entrada inválida, permiso denegado, recurso inexistente, red caída, conflicto de datos. Esto casi siempre es lo que el usuario no ha pensado todavía; vale la pena preguntarlo explícito.
+- **Qué queda FUERA del alcance** — ¿qué NO va a hacer esta feature, aunque parezca relacionado? Delimitar el borde ahora evita el scope creep después.
 
-Si el usuario ya respondió alguna de estas en su mensaje inicial (por ejemplo, viene de una sesión de brainstorming con contexto claro), no la repitas: pregunta solo lo que falta, manteniendo el rango de 3-5 preguntas útiles. Usa la herramienta AskUserQuestion cuando las preguntas tengan opciones concretas; texto libre cuando sean abiertas.
+No preguntes lo que ya sabes por el contexto o el código del repositorio. Si el usuario ya respondió algo en su mensaje inicial, no lo vuelvas a preguntar: usa esos cupos para lo que sigue sin resolver. Si con lo que te dieron ya tienes 4 de los 5 ejes claros, haz solo las preguntas que faltan.
 
-## Fase 2 — Generar el documento
+Usa la herramienta de preguntas del harness (`AskUserQuestion`) si conviene ofrecer opciones concretas; si no, pregunta en texto plano. Espera las respuestas antes de continuar.
 
-Con las respuestas, escribe la spec en **`specs/[nombre-feature]-spec.md`** (crea el directorio `specs/` si no existe; nombre de feature en kebab-case, en español). Estructura exacta:
+## Paso 2 — Escribe el documento
+
+Con las respuestas en mano, genera el archivo en **`specs/[nombre-feature]-spec.md`**. Elige un `nombre-feature` corto en kebab-case derivado de la idea (p. ej. `mapa-repartidores`, `export-csv`, `login-magic-link`). Crea la carpeta `specs/` si no existe.
+
+Estructura exacta del documento:
 
 ```markdown
 # Spec: [Nombre de la feature]
 
 ## Resumen
-[1 párrafo: qué es, para quién, y qué valor aporta.]
+Un solo párrafo: qué es la feature, para quién, y qué valor entrega. Alguien
+que lea solo esto debe entender de qué va.
 
 ## Problema y contexto
-[Qué duele hoy, por qué importa resolverlo ahora, y el contexto
-necesario para entender la feature sin haber estado en el brainstorming.]
+El dolor actual y por qué importa. Qué pasa hoy sin esta feature. Contexto
+relevante del sistema o del usuario que enmarca la decisión.
 
 ## Historias de usuario
-- Como [tipo de usuario], quiero [acción] para [beneficio].
-- ...
+Una lista en formato "Como [tipo de usuario], quiero [acción] para [beneficio]."
+Cubre los flujos principales, no todos los detalles. Cada historia debe poder
+mapearse a uno o más criterios de aceptación.
 
 ## Criterios de aceptación
-[Lista verificable — cada ítem debe poder marcarse como cumplido o no
-sin ambigüedad. Incluye SIEMPRE los casos de error, no solo el camino feliz.]
+Lista verificable, cada punto redactado para poder marcarse como cumplido/no
+cumplido sin ambigüedad. Incluye OBLIGATORIAMENTE los casos de error, no solo
+el flujo feliz. Usa un formato tipo:
 - [ ] Dado [contexto], cuando [acción], entonces [resultado observable].
-- [ ] Cuando [algo falla], el usuario ve [comportamiento de error esperado].
-- ...
+- [ ] Cuando [entrada inválida / permiso denegado / recurso ausente], el
+      sistema [respuesta esperada desde la óptica del usuario].
 
 ## Fuera de alcance
-[Lista explícita de lo que esta versión NO hace, para cortar
-discusiones de scope creep antes de que empiecen.]
+Lista explícita de lo que esta feature NO hará. Cada punto cierra una puerta
+para evitar malentendidos y scope creep.
 
 ## Preguntas abiertas
-[Dudas que quedaron sin resolver en la clarificación y decisiones
-que alguien tendrá que tomar después. Si no hay, escribe "Ninguna".]
+Lo que quedó sin resolver y hay que decidir antes o durante la construcción.
+Si no hay ninguna, escribe "Ninguna por ahora." en vez de dejarlo vacío.
 ```
 
-Reglas de calidad del documento:
+Reglas de redacción:
 
-- **Perspectiva del usuario, no del código**: "el usuario ve un mensaje de error claro", no "el endpoint devuelve 400".
-- **Criterios de aceptación verificables**: cada uno debe ser binario (se cumple o no). "La página carga rápido" no sirve; "el mapa muestra los marcadores en menos de 2 segundos con 100 puntos" sí.
-- **Los casos de error son criterios de primera clase**, no una nota al pie.
-- **Fuera de alcance nunca va vacío**: si el usuario no lo definió, propón tú los recortes obvios y márcalos como propuesta.
-- Lo que no quedó claro va a **Preguntas abiertas**, no lo inventes.
+- **Desde la perspectiva del usuario, no de la implementación.** Los criterios describen comportamiento observable ("el usuario ve un mensaje que explica qué campo falló"), no mecanismos internos ("se lanza un `ValidationError`"). El *cómo* se decide después, en la fase de planificación.
+- **Criterios verificables, no deseos.** "Rápido" no es criterio; "la lista carga en menos de 2 s con 1.000 registros" sí. Si algo no se puede comprobar, reescríbelo hasta que se pueda.
+- **Los casos de error son de primera clase.** Una spec sin casos de error está incompleta; cada flujo que puede fallar necesita su criterio.
+- Sé conciso. Una spec que nadie lee entera no sirve. Prefiere una lista clara a un párrafo largo.
 
-## Fase 3 — PAUSA OBLIGATORIA: aprobación explícita
+## Paso 3 — PAUSA OBLIGATORIA: pide aprobación
 
-Al terminar el documento, **detente por completo**. Muestra al usuario dónde quedó el archivo y un resumen breve de su contenido, y pide aprobación explícita.
+Al terminar de escribir el documento, **detente**. No planifiques, no propongas arquitectura, no escribas código, no llames a `ExitPlanMode`. Presenta un resumen brevísimo de lo escrito y pide aprobación explícita, algo como:
 
-Reglas de la pausa — no se negocian:
+> He escrito la spec en `specs/[nombre]-spec.md`. Revísala y dime si la **apruebas** o qué **cambios** quieres. No avanzaré a planificación ni implementación hasta tu aprobación.
 
-- **NO avances a implementación, planificación, creación de tareas, ni escritura de código** hasta que el usuario escriba "aprobado" (o un equivalente inequívoco de aprobación) o pida cambios.
-- No interpretes silencio, un "ok" ambiguo o una pregunta del usuario como aprobación. Ante la duda, pregunta: "¿Apruebas la spec o quieres cambios?".
-- Aunque el usuario haya dicho al principio "y luego impleméntalo", la pausa sigue aplicando: la spec debe aprobarse primero.
+Luego espera. **No avances hasta que el usuario escriba "aprobado" (o equivalente inequívoco de aprobación) o pida cambios.** Silencio, "ok gracias", o una pregunta sobre la spec no son aprobación para construir.
 
-## Fase 4 — Iterar hasta la aprobación
+## Paso 4 — Itera si piden cambios
 
-Si el usuario pide cambios:
+Si el usuario pide cambios, edita **el mismo archivo** `specs/[nombre-feature]-spec.md` (no crees uno nuevo), aplica lo pedido, y vuelve al Paso 3: repite la pausa y la petición de aprobación. Itera cuantas veces haga falta. Solo cuando llegue la aprobación explícita termina el trabajo de este skill; a partir de ahí, si el usuario quiere, ya puede empezar la planificación o implementación como una fase separada.
 
-- Edita **el mismo archivo** `specs/[nombre-feature]-spec.md` — no crees versiones nuevas (`-v2`, `-final`) ni documentos paralelos.
-- Aplica los cambios, muestra un resumen de qué cambió, y vuelve a la pausa de la Fase 3.
-- Repite tantas rondas como haga falta. El ciclo solo termina con aprobación explícita o con el usuario descartando la spec.
+## Principios que no se negocian
 
-Tras la aprobación, confirma que la spec quedó aprobada y pregunta si quiere que continúes con el siguiente paso (por ejemplo, un plan de implementación). La aprobación de la spec NO es permiso automático para implementar.
+- **Nunca escribas la spec sin haber preguntado primero.** Las preguntas son la mitad del valor.
+- **Nunca cruces de la spec a la implementación sin aprobación explícita.** Esa pausa es el punto entero de este skill; saltártela lo rompe.
+- La spec describe *qué* y *por qué*, nunca *cómo*. En cuanto te descubras escribiendo nombres de funciones, tablas o endpoints, párate: eso es planificación, y va después.
