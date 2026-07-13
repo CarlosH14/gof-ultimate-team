@@ -444,11 +444,24 @@
     activarTab("explicacion");
     modal.hidden = false;
     document.body.style.overflow = "hidden";
+    // reflow para que la transición de entrada arranque desde el estado inicial
+    void modal.offsetWidth;
+    modal.classList.add("is-open");
   }
 
   function cerrarModal() {
-    modal.hidden = true;
+    if (modal.hidden) return;
+    modal.classList.remove("is-open");
     document.body.style.overflow = "";
+    const panel = modal.querySelector(".modal");
+    const fin = () => {
+      if (modal.classList.contains("is-open")) return;   // se reabrió: no ocultar
+      modal.hidden = true;
+      panel.removeEventListener("transitionend", onEnd);
+    };
+    const onEnd = (e) => { if (e.target === panel && e.propertyName === "transform") fin(); };
+    panel.addEventListener("transitionend", onEnd);
+    setTimeout(fin, 300);   // fallback si transitionend no dispara
   }
 
   function activarTab(nombre) {

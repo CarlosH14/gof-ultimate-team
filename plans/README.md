@@ -12,10 +12,10 @@ ejecutarlos tal cual.
 | # | Título | Severidad | Categoría | Status |
 |---|--------|-----------|-----------|--------|
 | [001](001-animate-card-swaps-and-formation-with-flip.md) | Animar swaps e intercambios de formación con FLIP | **HIGH** | Interruptibilidad / Oportunidad | DONE |
-| [002](002-animate-modal-enter-exit.md) | Animar entrada y salida del modal | MEDIUM | Oportunidad / Cohesión | TODO |
-| [003](003-motion-tokens-and-fix-transition-all.md) | Tokens de motion y eliminar `transition: all` | MEDIUM | Cohesión / Rendimiento / Easing | TODO |
-| [004](004-prefers-reduced-motion.md) | Soporte de `prefers-reduced-motion` | MEDIUM | Accesibilidad | TODO |
-| [005](005-press-feedback-active-scale.md) | Feedback de pulsación (`:active` scale) | LOW | Físicalidad | TODO |
+| [002](002-animate-modal-enter-exit.md) | Animar entrada y salida del modal | MEDIUM | Oportunidad / Cohesión | DONE |
+| [003](003-motion-tokens-and-fix-transition-all.md) | Tokens de motion y eliminar `transition: all` | MEDIUM | Cohesión / Rendimiento / Easing | DONE |
+| [004](004-prefers-reduced-motion.md) | Soporte de `prefers-reduced-motion` | MEDIUM | Accesibilidad | DONE |
+| [005](005-press-feedback-active-scale.md) | Feedback de pulsación (`:active` scale) | LOW | Físicalidad | DONE |
 
 ## Orden de ejecución recomendado
 

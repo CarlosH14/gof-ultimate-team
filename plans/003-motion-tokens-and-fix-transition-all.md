@@ -1,6 +1,6 @@
 # 003 — Introducir tokens de motion y eliminar `transition: all`
 
-- **Status**: TODO
+- **Status**: DONE
 - **Commit**: cbb99b9
 - **Severity**: MEDIUM
 - **Category**: Cohesión / Rendimiento / Easing

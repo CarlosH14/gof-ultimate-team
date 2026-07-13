@@ -1,6 +1,6 @@
 # 002 — Animar la entrada y salida del modal de detalle
 
-- **Status**: TODO
+- **Status**: DONE
 - **Commit**: cbb99b9
 - **Severity**: MEDIUM
 - **Category**: Oportunidad perdida / Cohesión

@@ -25,6 +25,11 @@
   --panel: #141d30;
   --panel-2: #1b2740;
   --radius: 10px;
+  /* motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);        /* entradas/salidas de UI */
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);    /* movimiento en pantalla */
+  --dur-fast: 150ms;                                  /* hovers, chips */
+  --dur-base: 220ms;                                  /* modal, cartas */
   font-size: 16px;
 }
 
@@ -123,7 +128,11 @@ h1, h2, h3, .section-title, .card-name, .card-rating {
   border-radius: 999px;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: all 0.15s;
+  transition:
+    border-color var(--dur-fast) ease,
+    background-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    box-shadow var(--dur-fast) ease;
 }
 .cat-chip:hover { border-color: var(--gold-2); color: var(--text); }
 .cat-chip.active { background: var(--panel-2); border-color: var(--gold-2); color: var(--text); box-shadow: 0 0 12px rgba(227, 183, 78, 0.25); }
@@ -216,13 +225,19 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   border: none;
   background: transparent;
   padding: 0;
-  transition: filter 0.2s, opacity 0.2s;
+  transition: filter 0.2s, opacity 0.2s, transform 160ms var(--ease-out);
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
   -webkit-user-select: none;
   user-select: none;
 }
 .fut-card:hover, .fut-card:focus-visible { filter: drop-shadow(0 6px 14px rgba(245, 214, 123, 0.55)); z-index: 5; }
 .fut-card.dimmed { opacity: 0.25; }
+
+/* feedback de pulsación */
+.fut-card:active { transform: scale(0.97); }
+.pitch .fut-card:active { transform: translate(-50%, -50%) scale(0.97); }
+.cat-chip:active { transform: scale(0.97); }
+.card-swap:active { transform: scale(1.05); }
 
 .fut-card.dragging { opacity: 0.35; }
 .fut-card.drop-target {
@@ -420,7 +435,10 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   display: grid;
   place-items: center;
   padding: 1.2rem;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
 }
+.modal-overlay.is-open { opacity: 1; }
 
 .modal {
   position: relative;
@@ -433,7 +451,11 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   border-radius: 14px;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
   padding: 1.6rem;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
+.modal-overlay.is-open .modal { opacity: 1; transform: scale(1); }
 
 .modal-close {
   position: absolute;
@@ -447,7 +469,7 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   border-radius: 50%;
   cursor: pointer;
   font-size: 0.95rem;
-  transition: all 0.15s;
+  transition: color var(--dur-fast) ease, border-color var(--dur-fast) ease;
 }
 .modal-close:hover { color: var(--gold-1); border-color: var(--gold-2); }
 
@@ -548,6 +570,27 @@ main { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
   font-size: 0.8rem;
   border-top: 1px solid #1d2b4a;
   line-height: 1.7;
+}
+
+/* ---------- Reduced motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  /* el modal aparece solo con fade, sin scale */
+  .modal { transition: opacity 160ms ease; transform: none; }
+  .modal-overlay.is-open .modal { transform: none; }
+
+  /* desactivar el barrido de brillo diagonal de las cartas */
+  .fut-card:hover .card-face::before,
+  .fut-card:focus-visible .card-face::before {
+    transition: none;
+    transform: translateX(-120%);
+  }
+
+  /* red de seguridad: neutraliza cualquier @keyframes sin matar los fades de opacidad/color */
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 /* ---------- Responsive ---------- */

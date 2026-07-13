@@ -1,6 +1,6 @@
 # 005 — Feedback de pulsación (`:active` scale) en cartas y chips
 
-- **Status**: TODO
+- **Status**: DONE
 - **Commit**: cbb99b9
 - **Severity**: LOW
 - **Category**: Físicalidad

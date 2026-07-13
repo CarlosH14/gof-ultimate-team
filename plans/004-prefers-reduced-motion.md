@@ -1,6 +1,6 @@
 # 004 — Soporte de `prefers-reduced-motion`
 
-- **Status**: TODO
+- **Status**: DONE
 - **Commit**: cbb99b9
 - **Severity**: MEDIUM
 - **Category**: Accesibilidad
