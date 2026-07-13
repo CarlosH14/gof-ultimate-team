@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz — Gang of Four Ultimate Team</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="fut-header">
+    <div class="fut-header-inner">
+      <div class="fut-logo">
+        <span class="fut-logo-badge">GoF</span>
+        <div class="fut-logo-text">
+          <h1>QUIZ <span>ULTIMATE TEAM</span></h1>
+          <p class="fut-tagline">Pon a prueba tus patrones de diseño</p>
+        </div>
+      </div>
+      <a class="quiz-back" href="index.html">← Volver a la plantilla</a>
+    </div>
+  </header>
+
+  <main class="quiz-main">
+    <div class="quiz-app" id="quizApp">
+
+      <!-- Pantalla de inicio -->
+      <section class="quiz-screen" id="screenStart">
+        <h2>¿Fichas o te fichan?</h2>
+        <p>
+          Un quiz de <strong>10 preguntas</strong> sobre los 23 patrones del Gang of Four:
+          elige el patrón adecuado para cada caso de uso, responde verdadero/falso y
+          reconoce definiciones. Recibes feedback al instante y tu puntuación al final.
+        </p>
+        <button class="quiz-btn primary" id="btnStart">Empezar quiz</button>
+      </section>
+
+      <!-- Pantalla de carga -->
+      <section class="quiz-screen" id="screenLoading" hidden>
+        <div class="quiz-spinner" aria-hidden="true"></div>
+        <p>Cargando preguntas…</p>
+      </section>
+
+      <!-- Pantalla de error -->
+      <section class="quiz-screen" id="screenError" hidden>
+        <div class="quiz-error-icon" aria-hidden="true">⚠️</div>
+        <h2>Algo salió mal</h2>
+        <p id="errorMsg">No se pudieron cargar las preguntas. Inténtalo de nuevo.</p>
+        <button class="quiz-btn primary" id="btnRetry">Reintentar</button>
+      </section>
+
+      <!-- Pantalla de pregunta -->
+      <section class="quiz-screen" id="screenQuestion" hidden>
+        <div class="quiz-progress">
+          <div class="quiz-progress-text">
+            <span id="progressLabel">Pregunta 1 de 10</span>
+            <span class="quiz-type-badge" id="typeBadge">Caso</span>
+          </div>
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <h2 class="quiz-prompt" id="questionPrompt"></h2>
+        <div class="quiz-options" id="optionsList"></div>
+
+        <div class="quiz-feedback" id="feedback" hidden>
+          <p class="quiz-feedback-verdict" id="feedbackVerdict"></p>
+          <p class="quiz-feedback-explain" id="feedbackExplain"></p>
+        </div>
+
+        <div class="quiz-actions">
+          <button class="quiz-btn primary" id="btnAnswer" disabled>Responder</button>
+          <button class="quiz-btn primary" id="btnNext" hidden>Siguiente →</button>
+        </div>
+      </section>
+
+      <!-- Pantalla de resultado -->
+      <section class="quiz-screen" id="screenResult" hidden>
+        <h2>Resultado final</h2>
+        <div class="quiz-score" id="scoreBig">0 / 10</div>
+        <p class="quiz-score-sub" id="scoreSub"></p>
+        <p class="quiz-compare" id="compareText"></p>
+        <button class="quiz-btn primary" id="btnRestart">Repetir quiz</button>
+        <a class="quiz-btn ghost" href="index.html">Ver la plantilla</a>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="fut-footer">
+    <p>Quiz educativo sobre patrones de diseño. Preguntas almacenadas en Supabase; corrección del lado servidor.</p>
+  </footer>
+
+  <script src="js/supabase-config.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>
