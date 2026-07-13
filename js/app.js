@@ -221,7 +221,26 @@
 
   // ---------- render de campo y banquillo ----------
 
+  const prefiereReducir = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  // limpia los estilos inline que deja el FLIP para no fijar transforms
+  function limpiarInline(el) {
+    el.style.transition = "";
+    el.style.transform = "translate(-50%, -50%)";
+    el.style.opacity = "";
+  }
+
   function render() {
+    const animar = !prefiereReducir.matches;
+
+    // FIRST: medir la posición actual de cada carta del campo por id
+    const first = new Map();
+    if (animar) {
+      pitch.querySelectorAll(".fut-card").forEach((el) => {
+        first.set(el.dataset.id, el.getBoundingClientRect());
+      });
+    }
+
     asignarPosiciones();
 
     pitch.querySelectorAll(".fut-card").forEach((el) => el.remove());
@@ -236,7 +255,54 @@
     bench.innerHTML = "";
     banquillo.forEach((id) => bench.appendChild(crearCarta(porId[id])));
 
-    dibujarQuimica();
+    dibujarQuimica(animar);
+
+    // LAST + INVERT + PLAY sobre las cartas del campo.
+    // Se usa un reflow síncrono (no rAF) para que el PLAY arranque de forma fiable
+    // aunque la pestaña esté en segundo plano o rAF venga limitado.
+    if (animar) {
+      const entrantes = [];   // { el, tipo }
+      pitch.querySelectorAll(".fut-card").forEach((el) => {
+        const prev = first.get(el.dataset.id);
+        const last = el.getBoundingClientRect();
+        // limpieza al acabar: transitionend + fallback por si el evento no dispara
+        const limpiar = () => limpiarInline(el);
+        el.addEventListener("transitionend", limpiar, { once: true });
+        setTimeout(limpiar, 320);
+
+        if (prev) {
+          // deslizamiento: anteponer el delta al translate de centrado
+          const dx = prev.left - last.left;
+          const dy = prev.top - last.top;
+          el.style.transition = "none";
+          el.style.transform = `translate(-50%, -50%) translate(${dx}px, ${dy}px)`;
+          entrantes.push({ el, tipo: "mover" });
+        } else {
+          // carta que entra desde el banquillo (o carga inicial): fade + scale
+          el.style.transition = "none";
+          el.style.opacity = "0";
+          el.style.transform = "translate(-50%, -50%) scale(0.9)";
+          entrantes.push({ el, tipo: "entrar" });
+        }
+      });
+
+      // un único reflow forzado que fija el estado invertido antes del PLAY
+      void pitch.offsetWidth;
+
+      entrantes.forEach(({ el, tipo }) => {
+        if (tipo === "mover") {
+          el.style.transition =
+            "transform 260ms var(--ease-in-out, cubic-bezier(0.77,0,0.175,1))";
+          el.style.transform = "translate(-50%, -50%)";
+        } else {
+          el.style.transition =
+            "transform 260ms var(--ease-out, cubic-bezier(0.23,1,0.32,1)), opacity 200ms ease";
+          el.style.opacity = "";
+          el.style.transform = "translate(-50%, -50%)";
+        }
+      });
+    }
+
     aplicarFiltro();
     actualizarMedia();
   }
@@ -250,11 +316,23 @@
 
   // ---------- líneas de química ----------
 
-  function dibujarQuimica() {
+  function dibujarQuimica(animar) {
     const pintadas = new Set();
     chemSvg.setAttribute("viewBox", "0 0 100 130");
     chemSvg.setAttribute("preserveAspectRatio", "none");
     chemSvg.innerHTML = "";
+
+    // fade corto para evitar el doble-trazo mientras las cartas se deslizan
+    if (animar) {
+      chemSvg.style.transition = "none";
+      chemSvg.style.opacity = "0";
+      void chemSvg.offsetWidth;   // reflow: fija opacity 0 antes del fade
+      chemSvg.style.transition = "opacity 200ms ease";
+      chemSvg.style.opacity = "1";
+    } else {
+      chemSvg.style.transition = "";
+      chemSvg.style.opacity = "";
+    }
 
     once.forEach((id) => {
       const p = porId[id];
